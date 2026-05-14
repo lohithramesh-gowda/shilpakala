@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Change this to your machine's IP when testing on a real device
-const BASE_URL = __DEV__ ? "http://10.0.2.2:4000/api" : "https://api.shilpakala.in/api";
+const BASE_URL = __DEV__ ? "http://10.0.2.2:5001/api" : "https://api.shilpakala.in/api";
 
 const api = axios.create({ baseURL: BASE_URL, timeout: 10000 });
 
