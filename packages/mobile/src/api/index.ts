@@ -1,31 +1,60 @@
-import axios from "axios";
+import axios from 'axios';
+import { Platform } from 'react-native';
 
-// Change this to your machine's IP when testing on a real device
-const BASE_URL = __DEV__ ? "http://10.0.2.2:5001/api" : "https://api.shilpakala.in/api";
+// Android emulator → 10.0.2.2, iOS simulator / physical → your LAN IP or localhost
+const BASE_URL =
+  Platform.OS === 'android'
+    ? 'http://10.0.2.2:5001'
+    : 'http://localhost:5001';
 
-const api = axios.create({ baseURL: BASE_URL, timeout: 10000 });
+export const API_BASE = BASE_URL;
 
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 12000,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// ─── Artists ──────────────────────────────────────────────────────────────────
 export const artistsApi = {
-  getAll:  ()           => api.get("/artists"),
-  getById: (id: string) => api.get(`/artists/${id}`),
+  getAll:  ()           => api.get('/api/artists'),
+  getOne:  (id: string) => api.get(`/api/artists/${id}`),
 };
 
+// ─── Artworks ─────────────────────────────────────────────────────────────────
 export const artworksApi = {
-  getAll:  (params?: any)  => api.get("/artworks", { params }),
-  getById: (id: string)    => api.get(`/artworks/${id}`),
+  getAll: (params?: {
+    artistId?: string;
+    style?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  }) => api.get('/api/artworks', { params }),
+  getOne: (id: string) => api.get(`/api/artworks/${id}`),
 };
 
+// ─── WIP ──────────────────────────────────────────────────────────────────────
 export const wipApi = {
-  getAll: (artworkId: string) => api.get("/wip", { params: { artworkId } }),
+  getAll:         ()               => api.get('/api/wip'),
+  getByArtwork:   (artworkId: string) => api.get(`/api/wip/artwork/${artworkId}`),
 };
 
+// ─── Heritage ─────────────────────────────────────────────────────────────────
 export const heritageApi = {
-  getAll:  ()           => api.get("/heritage"),
-  getById: (id: string) => api.get(`/heritage/${id}`),
+  getAll:  ()           => api.get('/api/heritage'),
+  getOne:  (id: string) => api.get(`/api/heritage/${id}`),
 };
 
+// ─── Inquiries ────────────────────────────────────────────────────────────────
 export const inquiriesApi = {
-  create: (data: any) => api.post("/inquiries", data),
+  create: (data: {
+    artworkId: string;
+    productId: string;
+    buyerName: string;
+    buyerEmail: string;
+    buyerPhone?: string;
+    message: string;
+  }) => api.post('/api/inquiries', data),
 };
 
 export default api;

@@ -11,7 +11,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const PORT = parseInt(process.env.PORT || "4000");
+const PORT = parseInt(process.env.PORT || "5001");
 const HOST = process.env.HOST || "0.0.0.0";
 
 const app = Fastify({ logger: { transport: { target: "pino-pretty" } } });

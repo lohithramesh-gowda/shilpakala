@@ -1,50 +1,127 @@
-import React from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
-import FastImage from "react-native-fast-image";
-import { useQuery } from "@tanstack/react-query";
-import { artistsApi } from "../api";
-import { Colors, Spacing, Radius, Shadow } from "../theme";
+import React from 'react';
+import {
+  View, Text, FlatList, TouchableOpacity,
+  StyleSheet, ActivityIndicator, Dimensions,
+} from 'react-native';
+import { Image } from 'expo-image';
+import { useQuery } from '@tanstack/react-query';
+import { artistsApi } from '../api';
+import { Colors, Spacing, Radius, Shadow, Typography } from '../theme';
+
+const { width: W } = Dimensions.get('window');
+const CARD_W = (W - Spacing.md * 2 - Spacing.sm) / 2;
 
 export default function ArtistsScreen({ navigation }: any) {
-  const { data, isLoading } = useQuery({ queryKey:["artists"], queryFn:() => artistsApi.getAll() });
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['artists'],
+    queryFn:  () => artistsApi.getAll(),
+  });
+
   const artists: any[] = (data?.data as any)?.data ?? [];
 
-  if (isLoading) return <ActivityIndicator color={Colors.gold} style={{ flex:1 }} />;
+  if (isLoading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={Colors.gold} />
+        <Text style={styles.loadingTxt}>Loading Shilpis…</Text>
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorTxt}>Could not load artists</Text>
+        <TouchableOpacity style={styles.retryBtn} onPress={() => refetch()}>
+          <Text style={styles.retryTxt}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
-    <FlatList
-      data={artists}
-      keyExtractor={a => a.id}
-      contentContainerStyle={{ padding: Spacing.md, gap: Spacing.md }}
-      style={{ backgroundColor: Colors.cream }}
-      renderItem={({ item }) => (
-        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("ArtistDetail", { artistId: item.id })} activeOpacity={0.85}>
-          <FastImage source={{ uri: item.profileImage || "" }} style={styles.avatar} resizeMode={FastImage.resizeMode.cover} />
-          <View style={styles.info}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.location}>{item.location}</Text>
-            <View style={styles.tags}>
-              <View style={styles.tag}><Text style={styles.tagTxt}>{item.specialization}</Text></View>
-              {item.verified && <View style={[styles.tag, styles.tagVerified]}><Text style={[styles.tagTxt, { color:"#2563EB" }]}>✓ Verified</Text></View>}
+    <View style={styles.root}>
+      {/* Header banner */}
+      <View style={styles.banner}>
+        <Text style={styles.bannerTitle}>🪨 Master Shilpis</Text>
+        <Text style={styles.bannerSub}>Verified traditional stone & wood carvers</Text>
+      </View>
+
+      <FlatList
+        data={artists}
+        numColumns={2}
+        keyExtractor={a => a.id}
+        contentContainerStyle={styles.list}
+        columnWrapperStyle={{ gap: Spacing.sm }}
+        ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.88}
+            onPress={() => navigation.navigate('ArtistDetail', { artistId: item.id })}
+          >
+            <Image
+              source={{ uri: item.profileImage }}
+              style={styles.avatar}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={300}
+              placeholder={{ blurhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj' }}
+            />
+            {item.verified && (
+              <View style={styles.verifiedBadge}>
+                <Text style={styles.verifiedTxt}>✓ Verified</Text>
+              </View>
+            )}
+            <View style={styles.cardBody}>
+              <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+              <Text style={styles.specialization}>{item.specialization}</Text>
+              <Text style={styles.location} numberOfLines={1}>📍 {item.location}</Text>
             </View>
-            <Text style={styles.bio} numberOfLines={2}>{item.bio}</Text>
-          </View>
-        </TouchableOpacity>
-      )}
-    />
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card:     { backgroundColor:Colors.white, borderRadius:Radius.md, padding:Spacing.md, flexDirection:"row", gap:Spacing.md, ...Shadow.card },
-  avatar:   { width:70, height:70, borderRadius:35 },
-  info:     { flex:1 },
-  name:     { fontFamily:"Georgia", fontSize:16, color:Colors.ink },
-  location: { fontSize:12, color:Colors.muted, marginTop:2 },
-  tags:     { flexDirection:"row", gap:6, marginTop:6 },
-  tag:      { backgroundColor:Colors.cream, borderWidth:1, borderColor:Colors.border, borderRadius:Radius.round, paddingHorizontal:8, paddingVertical:2 },
-  tagVerified: { borderColor:"#BFDBFE", backgroundColor:"#EFF6FF" },
-  tagTxt:   { fontSize:10, color:Colors.muted, fontWeight:"600" },
-  bio:      { fontSize:12, color:Colors.muted, lineHeight:17, marginTop:8 },
+  root:   { flex: 1, backgroundColor: Colors.cream },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.cream },
+  banner: {
+    backgroundColor: Colors.ink,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.lg,
+    paddingTop: Spacing.sm,
+  },
+  bannerTitle:   { ...Typography.serif22, color: Colors.white, fontSize: 24 },
+  bannerSub:     { ...Typography.caption, color: 'rgba(255,255,255,0.65)', marginTop: 4 },
+  list:          { padding: Spacing.md },
+  card: {
+    width:         CARD_W,
+    backgroundColor: Colors.white,
+    borderRadius:  Radius.lg,
+    overflow:      'hidden',
+    ...Shadow.card,
+  },
+  avatar:        { width: CARD_W, height: CARD_W * 1.1 },
+  verifiedBadge: {
+    position:         'absolute',
+    top:              8,
+    right:            8,
+    backgroundColor: 'rgba(30,132,73,0.88)',
+    borderRadius:    Radius.round,
+    paddingHorizontal: 7,
+    paddingVertical:   3,
+  },
+  verifiedTxt:  { fontSize: 9, color: Colors.white, fontWeight: '700' },
+  cardBody:     { padding: Spacing.sm },
+  name:         { ...Typography.sans16, fontSize: 14 },
+  specialization:{ ...Typography.label, color: Colors.gold, marginTop: 2 },
+  location:     { ...Typography.caption, marginTop: 4 },
+  loadingTxt:   { ...Typography.caption, marginTop: Spacing.sm },
+  errorTxt:     { ...Typography.sans14, color: Colors.error },
+  retryBtn:     { marginTop: Spacing.md, backgroundColor: Colors.gold, borderRadius: Radius.md, paddingHorizontal: 24, paddingVertical: 10 },
+  retryTxt:     { color: Colors.white, fontWeight: '700' },
 });
 

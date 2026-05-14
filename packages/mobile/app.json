@@ -1,5 +1,37 @@
 {
-  "name": "ShilpaKala",
-  "displayName": "Shilpa-Kala Showcase"
+  "expo": {
+    "name": "Shilpa-Kala",
+    "slug": "shilpakala-showcase",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FAF7F2"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shilpakala.showcase",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["whatsapp"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FAF7F2"
+      },
+      "package": "com.shilpakala.showcase",
+      "queries": [
+        { "package": "com.whatsapp" },
+        { "package": "com.whatsapp.w4b" }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
 }
 

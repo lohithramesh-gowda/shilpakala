@@ -3,21 +3,65 @@
   "version": "1.0.0",
   "private": true,
   "description": "Shilpa-Kala Showcase - Digital Gallery for Traditional Stone & Wood Carvers",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": ["packages/*"],
+    "nohoist": [
+      "**/react-native",
+      "**/react-native/**",
+      "**/expo",
+      "**/expo/**",
+      "**/expo-image",
+      "**/expo-image/**",
+      "**/expo-linking",
+      "**/expo-linking/**",
+      "**/expo-status-bar",
+      "**/expo-status-bar/**",
+      "**/react-native-reanimated",
+      "**/react-native-reanimated/**",
+      "**/react-native-gesture-handler",
+      "**/react-native-gesture-handler/**",
+      "**/react-native-screens",
+      "**/react-native-screens/**",
+      "**/react-native-safe-area-context",
+      "**/react-native-safe-area-context/**",
+      "**/@react-navigation",
+      "**/@react-navigation/**",
+      "@shilpakala/mobile/react",
+      "@shilpakala/mobile/react/**",
+      "@shilpakala/mobile/@tanstack",
+      "@shilpakala/mobile/@tanstack/**",
+      "@shilpakala/mobile/axios",
+      "@shilpakala/mobile/axios/**"
+    ]
+  },
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail -p \"{name}\" -n \"API,WEB,MOBILE\" -c \"bgBlue.bold,bgGreen.bold,bgYellow.bold\" \"yarn backend\" \"yarn web\" \"yarn mobile\"",
-    "dev:server": "concurrently --kill-others-on-fail -p \"{name}\" -n \"API,WEB\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn backend\" \"yarn web\"",
+    "start": "bash start.sh",
+    "start:all": "bash start.sh --all",
+    "stop": "bash start.sh --stop",
+
+    "dev": "concurrently --kill-others-on-fail -p \"{name}\" -n \"API,WEB\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn backend\" \"yarn web:wait\"",
+    "dev:server": "concurrently --kill-others-on-fail -p \"{name}\" -n \"API,WEB\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn backend\" \"yarn web:wait\"",
+    "dev:all": "concurrently -p \"{name}\" -n \"API,WEB,EXPO\" -c \"bgBlue.bold,bgGreen.bold,bgYellow.bold\" \"yarn backend\" \"yarn web:wait\" \"yarn mobile\"",
+
     "backend": "yarn workspace @shilpakala/backend dev",
+
     "web": "yarn workspace @shilpakala/web start",
+    "web:wait": "wait-on http://localhost:5001/health --timeout 30000 && yarn web",
+
     "mobile": "yarn workspace @shilpakala/mobile start",
+    "mobile:android": "yarn workspace @shilpakala/mobile android",
+    "mobile:ios": "yarn workspace @shilpakala/mobile ios",
+    "mobile:tunnel": "yarn workspace @shilpakala/mobile start --tunnel",
+    "mobile:lan": "yarn workspace @shilpakala/mobile start --lan",
+    "mobile:web": "yarn workspace @shilpakala/mobile web",
+
     "build": "yarn build:backend && yarn build:web",
     "build:backend": "yarn workspace @shilpakala/backend build",
     "build:web": "yarn workspace @shilpakala/web build"
   },
   "dependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "wait-on": "^9.0.10"
   },
   "engines": {
     "node": ">=18.0.0",
