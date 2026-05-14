@@ -1,0 +1,26 @@
+{
+  "name": "shilpakala-showcase",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shilpa-Kala Showcase - Digital Gallery for Traditional Stone & Wood Carvers",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail -p \"{name}\" -n \"API,WEB,MOBILE\" -c \"bgBlue.bold,bgGreen.bold,bgYellow.bold\" \"yarn backend\" \"yarn web\" \"yarn mobile\"",
+    "dev:server": "concurrently --kill-others-on-fail -p \"{name}\" -n \"API,WEB\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn backend\" \"yarn web\"",
+    "backend": "yarn workspace @shilpakala/backend dev",
+    "web": "yarn workspace @shilpakala/web start",
+    "mobile": "yarn workspace @shilpakala/mobile start",
+    "build": "yarn build:backend && yarn build:web",
+    "build:backend": "yarn workspace @shilpakala/backend build",
+    "build:web": "yarn workspace @shilpakala/web build"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=1.22.0"
+  }
+}
